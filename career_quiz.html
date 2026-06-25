@@ -526,10 +526,10 @@ function saveSchoolInfo() {
   displaySchool('principal', 'showPrincipal');
   const st = document.getElementById('setupStatus');
   st.style.display = 'inline';
-  updateToggleLabel();
   setTimeout(() => {
     st.style.display = 'none';
     document.getElementById('setupPanel').classList.remove('open');
+    document.getElementById('setupToggleBtn').classList.remove('visible');
   }, 1200);
 }
 
@@ -545,7 +545,6 @@ function resetSchoolInfo() {
   displaySchool('tree', 'showTree');
   displaySchool('flower', 'showFlower');
   displaySchool('principal', 'showPrincipal');
-  updateToggleLabel();
 }
 
 // ───────────────────────────────────────────────
@@ -1100,7 +1099,7 @@ function updateToggleLabel() {
 
 // 초기 화면
 show('stepGrade');
-updateToggleLabel();
+document.getElementById('setupToggleBtn').classList.remove('visible');
 </script>
 </body>
 </html>
