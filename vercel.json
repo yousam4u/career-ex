@@ -11,6 +11,10 @@
     {
       "source": "/chocolatier-final",
       "destination": "/index.html"
+    },
+    {
+      "source": "/quiz",
+      "destination": "/career_quiz.html"
     }
   ]
 }
