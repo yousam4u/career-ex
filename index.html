@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>You쌤 퀴즈 보드</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">You쌤 퀴즈 보드</p>
+          <h1 id="pageTitle">수업 전 두뇌 깨우기 퀴즈</h1>
+        </div>
+        <button id="adminOpenButton" class="icon-button" type="button" aria-label="관리자 열기" title="관리자">
+          ⚙
+        </button>
+      </header>
+
+      <section class="quiz-stage" aria-live="polite">
+        <div class="quiz-meta">
+          <span id="quizCount">1 / 5</span>
+        </div>
+        <button id="quizCard" class="quiz-card" type="button">
+          <span class="card-label">문제</span>
+          <strong id="quizQuestion"></strong>
+          <span id="quizAnswer" class="answer-text"></span>
+        </button>
+        <div class="controls">
+          <button id="prevButton" type="button" class="secondary-button">이전</button>
+          <button id="showButton" type="button" class="primary-button">정답 보기</button>
+          <button id="nextButton" type="button" class="secondary-button">다음</button>
+        </div>
+      </section>
+
+    </main>
+
+    <aside id="adminPanel" class="admin-panel" aria-hidden="true">
+      <div class="admin-dialog" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+        <div class="admin-header">
+          <div>
+            <p class="eyebrow">Admin</p>
+            <h2 id="adminTitle">퀴즈 관리</h2>
+          </div>
+          <button id="adminCloseButton" class="icon-button" type="button" aria-label="닫기" title="닫기">×</button>
+        </div>
+
+        <form id="loginForm" class="login-form">
+          <label>
+            관리자 비밀번호
+            <input id="passwordInput" type="password" autocomplete="current-password" placeholder="기본값: youssam" />
+          </label>
+          <button type="submit" class="primary-button">로그인</button>
+          <p class="helper">정적 페이지용 간단 잠금입니다. 실제 서비스에서는 서버 인증이 필요합니다.</p>
+        </form>
+
+        <div id="editorArea" class="editor-area" hidden>
+          <div class="generator-box">
+            <label>
+              저장된 퀴즈 불러오기
+              <select id="quizSetSelect">
+                <option value="">저장된 퀴즈를 선택하세요</option>
+              </select>
+            </label>
+            <label>
+              주제 또는 짧은 키워드
+              <input id="topicInput" type="text" placeholder="예: 드론 안전, 생성형 AI, 독도, 물의 순환" />
+            </label>
+            <div class="split-fields">
+              <label>
+                대상
+                <select id="levelInput">
+                  <option>초등 저학년</option>
+                  <option selected>초등학생</option>
+                  <option>중학생</option>
+                </select>
+              </label>
+              <label>
+                문제 수
+                <select id="countInput">
+                  <option>3</option>
+                  <option selected>5</option>
+                  <option>7</option>
+                </select>
+              </label>
+            </div>
+            <button id="generateButton" type="button" class="primary-button">문제 자동 만들기</button>
+          </div>
+
+          <label>
+            퀴즈 내용 직접 편집
+            <textarea id="quizEditor" spellcheck="false"></textarea>
+          </label>
+          <div class="editor-actions">
+            <button id="saveButton" type="button" class="primary-button">저장</button>
+            <button id="resetButton" type="button" class="secondary-button">기본값 복원</button>
+          </div>
+          <p class="helper">형식: 한 줄에 `문제 | 정답`으로 입력합니다. 저장한 퀴즈는 `data/quizzes.db`에 보관됩니다.</p>
+        </div>
+      </div>
+    </aside>
+
+    <script src="app.js"></script>
+  </body>
+</html>

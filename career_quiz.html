@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>진로체험 퀴즈 🎯</title>
+<style>
+  :root {
+    --robot-color: #3B82F6;
+    --robot-light: #EFF6FF;
+    --robot-dark: #1D4ED8;
+    --drone-color: #10B981;
+    --drone-light: #ECFDF5;
+    --drone-dark: #065F46;
+    --choco-color: #92400E;
+    --choco-light: #FEF3C7;
+    --choco-dark: #78350F;
+    --correct: #22C55E;
+    --wrong: #EF4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 700px;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    text-align: center;
+    color: white;
+    margin-bottom: 24px;
+  }
+  .header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+  .header p { font-size: 1rem; opacity: 0.85; margin-top: 6px; }
+
+  /* ── 카드 공통 ── */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    margin-bottom: 16px;
+  }
+
+  /* ── 학교 설정 패널 ── */
+  .setup-toggle {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    padding: 10px 18px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .setup-toggle:hover { background: rgba(255,255,255,0.25); }
+
+  .setup-panel {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 16px;
+    display: none;
+    border: 2px solid #E0E7FF;
+  }
+  .setup-panel.open { display: block; }
+  .setup-panel-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 6px;
+  }
+  .setup-panel-header h3 { font-size: 1rem; font-weight: 800; color: #3730A3; }
+  .admin-badge {
+    background: #EEF2FF; color: #4338CA;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 99px;
+    border: 1px solid #C7D2FE;
+  }
+  .setup-desc {
+    font-size: 0.8rem; color: #6B7280; margin-bottom: 16px;
+    line-height: 1.5;
+    background: #F9FAFB; border-radius: 8px; padding: 8px 12px;
+    border-left: 3px solid #667eea;
+  }
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .setup-field { }
+  .setup-field .field-label-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  .setup-field label { font-size: 0.78rem; font-weight: 700; color: #374151; }
+  .setup-field .correct-tag {
+    font-size: 0.68rem; background: #DCFCE7; color: #166534;
+    padding: 2px 6px; border-radius: 99px; font-weight: 700;
+  }
+  .setup-field input {
+    width: 100%;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .setup-field input:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.15); }
+  .setup-field .current-val {
+    font-size: 0.72rem; color: #9CA3AF; margin-top: 4px;
+  }
+  .setup-field .current-val span { color: #4338CA; font-weight: 600; }
+  .setup-actions { display: flex; gap: 8px; margin-top: 14px; align-items: center; }
+  .setup-save {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .setup-reset {
+    background: white;
+    color: #6B7280;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .setup-status { font-size: 0.78rem; color: #059669; font-weight: 600; margin-left: 4px; display: none; }
+
+  /* ── 홈 버튼 ── */
+  .home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #F3F4F6;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.82rem;
+    color: #6B7280;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s;
+    margin-bottom: 12px;
+  }
+  .home-btn:hover { background: #E5E7EB; color: #374151; }
+
+  /* ── 선택 버튼 그리드 ── */
+  .section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .btn-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .btn-grid.cols2 { grid-template-columns: 1fr 1fr; }
+  .btn-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .sel-btn {
+    border: 2.5px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+  }
+  .sel-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .sel-btn .icon { font-size: 2rem; margin-bottom: 6px; }
+  .sel-btn .label { font-size: 0.95rem; font-weight: 700; color: #1F2937; }
+  .sel-btn .desc { font-size: 0.75rem; color: #6B7280; margin-top: 3px; }
+
+  .sel-btn.robot { border-color: var(--robot-color); background: var(--robot-light); }
+  .sel-btn.drone { border-color: var(--drone-color); background: var(--drone-light); }
+  .sel-btn.choco { border-color: var(--choco-color); background: var(--choco-light); }
+  .sel-btn.start-btn { border-color: #8B5CF6; background: #F5F3FF; }
+  .sel-btn.end-btn { border-color: #F59E0B; background: #FFFBEB; }
+  .sel-btn.elem { border-color: #06B6D4; background: #ECFEFF; }
+  .sel-btn.middle { border-color: #6366F1; background: #EEF2FF; }
+
+  /* ── 퀴즈 화면 ── */
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .quiz-meta { font-size: 0.8rem; color: #9CA3AF; }
+  .quiz-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .progress-bar {
+    background: #F3F4F6;
+    border-radius: 99px;
+    height: 8px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .question-num { font-size: 0.82rem; color: #9CA3AF; font-weight: 600; margin-bottom: 8px; }
+  .question-text { font-size: 1.15rem; font-weight: 700; color: #111827; line-height: 1.5; margin-bottom: 22px; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 13px 16px;
+    text-align: left;
+    cursor: pointer;
+    background: white;
+    font-size: 0.95rem;
+    color: #374151;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #667eea; background: #F5F3FF; transform: translateX(3px); }
+  .choice-btn .choice-marker {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #F3F4F6;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.82rem; font-weight: 700; color: #6B7280;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .choice-btn.correct { border-color: var(--correct); background: #F0FDF4; }
+  .choice-btn.correct .choice-marker { background: var(--correct); color: white; }
+  .choice-btn.wrong { border-color: var(--wrong); background: #FEF2F2; }
+  .choice-btn.wrong .choice-marker { background: var(--wrong); color: white; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: none;
+  }
+  .feedback.correct { background: #F0FDF4; color: #166534; border: 1.5px solid #86EFAC; }
+  .feedback.wrong { background: #FEF2F2; color: #991B1B; border: 1.5px solid #FCA5A5; }
+  .feedback.show { display: block; }
+
+  .next-btn {
+    margin-top: 18px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    transition: opacity 0.2s;
+  }
+  .next-btn:hover { opacity: 0.9; }
+  .next-btn.show { display: block; }
+
+  /* ── 결과 화면 ── */
+  .result-circle {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+  }
+  .result-circle .score-num { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+  .result-circle .score-label { font-size: 0.75rem; opacity: 0.85; }
+
+  .result-msg { text-align: center; margin-bottom: 24px; }
+  .result-msg h2 { font-size: 1.4rem; font-weight: 800; color: #111827; margin-bottom: 6px; }
+  .result-msg p { color: #6B7280; font-size: 0.9rem; }
+
+  .result-list { list-style: none; }
+  .result-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: 0.88rem;
+    color: #374151;
+    line-height: 1.5;
+  }
+  .result-list li:last-child { border-bottom: none; }
+  .result-list .ri { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  .retry-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* ── 유틸 ── */
+  .hidden { display: none !important; }
+  .divider { height: 1px; background: #F3F4F6; margin: 18px 0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 헤더 -->
+  <div class="header">
+    <h1>🎯 진로체험 퀴즈</h1>
+    <p>수업 시작과 마무리를 퀴즈로 함께해요!</p>
+  </div>
+
+  <!-- 학교 정보 설정 -->
+  <button class="setup-toggle" onclick="toggleSetup()" id="setupToggleBtn">🔐 관리자 모드 · 학교 정보 설정</button>
+  <div class="setup-panel" id="setupPanel">
+    <div class="setup-panel-header">
+      <h3>🏫 학교 퀴즈 정답 설정</h3>
+      <span class="admin-badge">관리자 전용</span>
+    </div>
+    <div class="setup-desc">
+      아래에 <strong>이 학교의 정답</strong>을 직접 입력하세요.<br>
+      중·고등 시작 퀴즈의 1~3번 문제 정답으로 사용됩니다. 학교마다 다르므로 수업 전 미리 설정해 주세요.
+    </div>
+    <div class="setup-grid">
+      <div class="setup-field">
+        <div class="field-label-row">
+          <label>교목 (학교 나무)</label>
+          <span class="correct-tag">정답</span>
+        </div>
+        <input type="text" id="inputTree" placeholder="예: 느티나무">
+        <div class="current-val">현재 정답: <span id="showTree">—</span></div>
+      </div>
+      <div class="setup-field">
+        <div class="field-label-row">
+          <label>교화 (학교 꽃)</label>
+          <span class="correct-tag">정답</span>
+        </div>
+        <input type="text" id="inputFlower" placeholder="예: 개나리">
+        <div class="current-val">현재 정답: <span id="showFlower">—</span></div>
+      </div>
+      <div class="setup-field">
+        <div class="field-label-row">
+          <label>교장선생님 성함</label>
+          <span class="correct-tag">정답</span>
+        </div>
+        <input type="text" id="inputPrincipal" placeholder="예: 홍길동 선생님">
+        <div class="current-val">현재 정답: <span id="showPrincipal">—</span></div>
+      </div>
+    </div>
+    <div class="setup-actions">
+      <button class="setup-save" onclick="saveSchoolInfo()">✅ 정답 저장</button>
+      <button class="setup-reset" onclick="resetSchoolInfo()">🗑 초기화</button>
+      <span class="setup-status" id="setupStatus">✓ 저장되었습니다</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: 학년 선택 -->
+  <div class="card" id="stepGrade">
+    <div class="section-title">Step 1 · 학년을 선택하세요</div>
+    <div class="btn-grid cols2">
+      <div class="sel-btn elem" onclick="selectGrade('elem')">
+        <div class="icon">🌱</div>
+        <div class="label">초등학교</div>
+        <div class="desc">3~6학년</div>
+      </div>
+      <div class="sel-btn middle" onclick="selectGrade('middle')">
+        <div class="icon">📚</div>
+        <div class="label">중·고등학교</div>
+        <div class="desc">중1~고3</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: 과목 선택 -->
+  <div class="card hidden" id="stepSubject">
+    <div class="section-title">Step 2 · 오늘의 진로 과목</div>
+    <div class="btn-grid cols3">
+      <div class="sel-btn robot" onclick="selectSubject('robot')">
+        <div class="icon">🤖</div>
+        <div class="label">로봇공학자</div>
+        <div class="desc">미래 기술의 꿈</div>
+      </div>
+      <div class="sel-btn drone" onclick="selectSubject('drone')">
+        <div class="icon">🚁</div>
+        <div class="label">드론전문가</div>
+        <div class="desc">하늘을 나는 직업</div>
+      </div>
+      <div class="sel-btn choco" onclick="selectSubject('choco')">
+        <div class="icon">🍫</div>
+        <div class="label">쇼콜라티에</div>
+        <div class="desc">달콤한 예술가</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: 시작/마무리 선택 -->
+  <div class="card hidden" id="stepTiming">
+    <div class="section-title">Step 3 · 퀴즈 종류</div>
+    <div class="btn-grid cols2">
+      <div class="sel-btn start-btn" onclick="selectTiming('start')">
+        <div class="icon">🔔</div>
+        <div class="label">수업 시작 퀴즈</div>
+        <div class="desc">수업 전 흥미 UP!</div>
+      </div>
+      <div class="sel-btn end-btn" onclick="selectTiming('end')">
+        <div class="icon">🏆</div>
+        <div class="label">수업 마무리 퀴즈</div>
+        <div class="desc">오늘 배운 내용 확인</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: 퀴즈 화면 -->
+  <div class="card hidden" id="stepQuiz">
+    <button class="home-btn" onclick="restart()">🏠 처음으로</button>
+    <div class="quiz-header">
+      <span class="quiz-meta" id="quizMeta"></span>
+      <span class="quiz-badge" id="quizBadge"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="question-num" id="questionNum"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="choices" id="choicesContainer"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">다음 문제 →</button>
+  </div>
+
+  <!-- STEP 5: 결과 화면 -->
+  <div class="card hidden" id="stepResult">
+    <button class="home-btn" onclick="restart()">🏠 처음으로</button>
+    <div class="result-circle">
+      <span class="score-num" id="resultScore">0</span>
+      <span class="score-label">/ <span id="resultTotal">0</span> 점</span>
+    </div>
+    <div class="result-msg">
+      <h2 id="resultTitle"></h2>
+      <p id="resultDesc"></p>
+    </div>
+    <div class="divider"></div>
+    <ul class="result-list" id="resultList"></ul>
+    <button class="retry-btn" onclick="restart()">🔄 처음으로 돌아가기</button>
+  </div>
+</div>
+
+<script>
+// ───────────────────────────────────────────────
+// 학교 정보 (기본값)
+// ───────────────────────────────────────────────
+let school = {
+  tree: localStorage.getItem('school_tree') || '',
+  flower: localStorage.getItem('school_flower') || '',
+  principal: localStorage.getItem('school_principal') || ''
+};
+
+function displaySchool(key, elId) {
+  const val = school[key];
+  document.getElementById(elId).textContent = val || '미입력';
+}
+
+function toggleSetup() {
+  const p = document.getElementById('setupPanel');
+  p.classList.toggle('open');
+  if (p.classList.contains('open')) {
+    document.getElementById('inputTree').value = school.tree;
+    document.getElementById('inputFlower').value = school.flower;
+    document.getElementById('inputPrincipal').value = school.principal;
+    displaySchool('tree', 'showTree');
+    displaySchool('flower', 'showFlower');
+    displaySchool('principal', 'showPrincipal');
+  }
+}
+
+function saveSchoolInfo() {
+  const t = document.getElementById('inputTree').value.trim();
+  const f = document.getElementById('inputFlower').value.trim();
+  const p = document.getElementById('inputPrincipal').value.trim();
+  if (t) { school.tree = t; localStorage.setItem('school_tree', t); }
+  if (f) { school.flower = f; localStorage.setItem('school_flower', f); }
+  if (p) { school.principal = p; localStorage.setItem('school_principal', p); }
+  displaySchool('tree', 'showTree');
+  displaySchool('flower', 'showFlower');
+  displaySchool('principal', 'showPrincipal');
+  const st = document.getElementById('setupStatus');
+  st.style.display = 'inline';
+  updateToggleLabel();
+  setTimeout(() => {
+    st.style.display = 'none';
+    document.getElementById('setupPanel').classList.remove('open');
+  }, 1200);
+}
+
+function resetSchoolInfo() {
+  if (!confirm('학교 정보를 초기화할까요?')) return;
+  ['tree','flower','principal'].forEach(k => {
+    school[k] = '';
+    localStorage.removeItem('school_' + k);
+  });
+  document.getElementById('inputTree').value = '';
+  document.getElementById('inputFlower').value = '';
+  document.getElementById('inputPrincipal').value = '';
+  displaySchool('tree', 'showTree');
+  displaySchool('flower', 'showFlower');
+  displaySchool('principal', 'showPrincipal');
+  updateToggleLabel();
+}
+
+// ───────────────────────────────────────────────
+// 퀴즈 데이터
+// ───────────────────────────────────────────────
+function getQuizData(grade, subject, timing) {
+  // 학교 정보 미설정 체크
+  const treeAns = school.tree || '(교목 미설정)';
+  const flowerAns = school.flower || '(교화 미설정)';
+  const principalAns = school.principal || '(교장선생님 미설정)';
+
+  // 중등 시작 공통 3문제 (학교 정보 — 관리자 정답 기반)
+  const schoolQs = () => [
+    {
+      q: '우리 학교를 대표하는 나무(교목)는 무엇일까요?',
+      choices: shuffleWithCorrect(treeAns, ['소나무', '은행나무', '벚나무', '느티나무', '향나무', '잣나무']),
+      answer: treeAns,
+      hint: `정답은 "${treeAns}"입니다. 학교 교목을 기억해 두세요! 🌳`
+    },
+    {
+      q: '우리 학교를 대표하는 꽃(교화)은 무엇일까요?',
+      choices: shuffleWithCorrect(flowerAns, ['개나리', '진달래', '무궁화', '장미', '철쭉', '코스모스']),
+      answer: flowerAns,
+      hint: `정답은 "${flowerAns}"입니다. 학교 교화를 기억해 두세요! 🌸`
+    },
+    {
+      q: '우리 학교 교장선생님 성함은 무엇일까요?',
+      choices: shuffleWithCorrect(principalAns, ['김민준 선생님', '이서연 선생님', '박지호 선생님', '최예린 선생님', '정현우 선생님']),
+      answer: principalAns,
+      hint: `정답은 "${principalAns}"입니다. 교장선생님께 인사드려 보세요! 😊`
+    }
+  ];
+
+  const data = {
+    // ──────────────────────────────
+    // 초등 시작 퀴즈
+    // ──────────────────────────────
+    elem_robot_start: [
+      {
+        q: '로봇에게 "앞으로 가!", "멈춰!" 같은 명령을 내리는 것을 무엇이라 할까요?',
+        choices: ['프로그래밍', '요리', '노래', '그림 그리기'],
+        answer: '프로그래밍',
+        hint: '로봇에게 내리는 명령들의 모음을 "프로그래밍"이라고 해요! 💻'
+      },
+      {
+        q: '로봇의 "눈" 역할을 하며 주변을 감지하는 장치는 무엇일까요?',
+        choices: ['센서', '배터리', '나사', '페인트'],
+        answer: '센서',
+        hint: '로봇이 주변 환경을 느끼는 장치를 "센서"라고 해요! 👁️'
+      },
+      {
+        q: '집 안에서 혼자 바닥을 청소하는 우리 생활 속 로봇은?',
+        choices: ['로봇청소기', '전자레인지', '냉장고', '세탁기'],
+        answer: '로봇청소기',
+        hint: '혼자 돌아다니며 청소하는 "로봇청소기"가 생활 속 로봇이에요! 🏠'
+      },
+      {
+        q: '🎯 오늘의 진로 직업! 로봇을 설계하고 프로그래밍하여 세상을 바꾸는 이 직업은?',
+        choices: ['로봇공학자', '드론전문가', '쇼콜라티에', '건축가'],
+        answer: '로봇공학자',
+        hint: '오늘 여러분이 체험할 직업, "로봇공학자"입니다! 🤖'
+      }
+    ],
+    elem_drone_start: [
+      {
+        q: '드론을 다른 말로 무엇이라고 할까요?',
+        choices: ['무인기', '자동차', '배', '기차'],
+        answer: '무인기',
+        hint: '사람이 타지 않고 조종하는 비행체를 "무인기"라고 해요! ✈️'
+      },
+      {
+        q: '드론이 하늘을 날 수 있게 해주는 빙글빙글 돌아가는 것은?',
+        choices: ['프로펠러(날개)', '바퀴', '닻', '돛'],
+        answer: '프로펠러(날개)',
+        hint: '드론의 빙글빙글 돌아가는 날개가 "프로펠러"예요! 🌀'
+      },
+      {
+        q: '드론을 안전하게 날리기 위해 가장 알맞은 장소는?',
+        choices: ['사람이 없는 넓은 공간', '지하철역 안', '교실 안', '좁은 골목'],
+        answer: '사람이 없는 넓은 공간',
+        hint: '드론은 반드시 안전한 공간에서 날려야 해요! ⚠️'
+      },
+      {
+        q: '🎯 오늘의 진로 직업! 드론을 조종하고 개발하며 하늘을 누비는 이 직업은?',
+        choices: ['드론전문가', '로봇공학자', '쇼콜라티에', '파일럿'],
+        answer: '드론전문가',
+        hint: '오늘 여러분이 체험할 직업, "드론전문가"입니다! 🚁'
+      }
+    ],
+    elem_choco_start: [
+      {
+        q: '초콜릿의 원래 재료는 무엇일까요?',
+        choices: ['카카오 열매', '고추', '당근', '감자'],
+        answer: '카카오 열매',
+        hint: '초콜릿은 카카오나무의 열매인 "카카오빈"으로 만들어요! 🌱'
+      },
+      {
+        q: '카카오나무는 주로 어느 기후에서 잘 자랄까요?',
+        choices: ['덥고 습한 열대 지방', '차가운 북극', '사막', '우리나라 겨울'],
+        answer: '덥고 습한 열대 지방',
+        hint: '카카오는 덥고 비가 많이 오는 열대 지방에서 자라요! ☀️'
+      },
+      {
+        q: '카카오 성분이 몸에 들어오면 어떤 기분이 들까요?',
+        choices: ['기분이 좋아진다', '배가 아프다', '잠이 온다', '화가 난다'],
+        answer: '기분이 좋아진다',
+        hint: '카카오에 들어있는 성분이 기분을 좋게 만들어 준답니다! 😊'
+      },
+      {
+        q: '🎯 오늘의 진로 직업! 카카오로 달콤한 초콜릿 예술을 만드는 이 직업은?',
+        choices: ['쇼콜라티에', '로봇공학자', '드론전문가', '제빵사'],
+        answer: '쇼콜라티에',
+        hint: '오늘 여러분이 체험할 직업, "쇼콜라티에"입니다! 🍫'
+      }
+    ],
+
+    // ──────────────────────────────
+    // 초등 마무리 퀴즈
+    // ──────────────────────────────
+    elem_robot_end: [
+      {
+        q: '오늘 로봇을 움직이게 한 명령어 순서를 무엇이라 하나요?',
+        choices: ['알고리즘', '노래', '그림', '춤'],
+        answer: '알고리즘',
+        hint: '문제 해결을 위한 명령 순서를 "알고리즘"이라고 해요! 📋'
+      },
+      {
+        q: '로봇이 장애물을 피하려면 무엇이 필요할까요?',
+        choices: ['장애물 감지 센서', '더 큰 바퀴', '예쁜 색깔', '빠른 음악'],
+        answer: '장애물 감지 센서',
+        hint: '장애물을 감지하는 "센서"가 있어야 피할 수 있어요! 🔍'
+      },
+      {
+        q: '오늘 수업처럼 스스로 움직이는 로봇의 미래 활용 분야는?',
+        choices: ['의료·배달·탐사 등 다양한 분야', '오직 장난감', '음식 먹기', '그림 색칠'],
+        answer: '의료·배달·탐사 등 다양한 분야',
+        hint: '로봇은 의료, 우주탐사, 배달 등 다양한 곳에 쓰여요! 🚀'
+      },
+      {
+        q: '로봇공학자가 되려면 어떤 과목을 열심히 공부해야 할까요?',
+        choices: ['수학, 과학, 컴퓨터', '체육만', '미술만', '음악만'],
+        answer: '수학, 과학, 컴퓨터',
+        hint: '로봇공학자는 수학·과학·프로그래밍 모두 중요해요! 📐'
+      }
+    ],
+    elem_drone_end: [
+      {
+        q: '드론을 날릴 때 가장 먼저 확인해야 할 것은?',
+        choices: ['배터리 충전 상태', '드론 색깔', '드론 무게', '조종기 색깔'],
+        answer: '배터리 충전 상태',
+        hint: '비행 전 배터리 확인이 가장 중요해요! 🔋'
+      },
+      {
+        q: '드론이 갑자기 조종이 안 될 때 어떻게 해야 할까요?',
+        choices: ['즉시 착륙 버튼을 누른다', '더 높이 날린다', '무시한다', '달려간다'],
+        answer: '즉시 착륙 버튼을 누른다',
+        hint: '비상 시엔 즉시 안전하게 착륙시키는 것이 중요해요! 🛬'
+      },
+      {
+        q: '드론 전문가가 되면 어떤 일을 할 수 있을까요?',
+        choices: ['영화 촬영, 재난 구조, 농업', '수영 선수', '요리사', '소설가'],
+        answer: '영화 촬영, 재난 구조, 농업',
+        hint: '드론은 촬영·구조·농업 등 정말 다양하게 쓰여요! 🌾'
+      },
+      {
+        q: '드론을 날리려면 꼭 지켜야 하는 것은?',
+        choices: ['비행 규칙과 안전 수칙', '빠른 속도', '높은 고도', '화려한 색깔'],
+        answer: '비행 규칙과 안전 수칙',
+        hint: '드론 비행은 규칙을 지켜야 안전하고 합법적이에요! ⚖️'
+      }
+    ],
+    elem_choco_end: [
+      {
+        q: '초콜릿을 만들 때 온도를 조절하는 중요한 과정은?',
+        choices: ['템퍼링', '냉동', '끓이기', '얼리기'],
+        answer: '템퍼링',
+        hint: '초콜릿을 광택있게 굳히는 온도 조절 과정을 "템퍼링"이라 해요! 🌡️'
+      },
+      {
+        q: '좋은 초콜릿의 특징으로 올바른 것은?',
+        choices: ['표면이 매끄럽고 광택이 난다', '표면이 거칠고 하얗게 변한다', '쉽게 녹지 않는다', '단맛이 전혀 없다'],
+        answer: '표면이 매끄럽고 광택이 난다',
+        hint: '잘 만든 초콜릿은 표면이 매끈하고 빛이 나요! ✨'
+      },
+      {
+        q: '쇼콜라티에가 되기 위해 가장 중요한 능력은?',
+        choices: ['섬세함과 창의력', '빠른 달리기', '큰 목소리', '긴 손가락'],
+        answer: '섬세함과 창의력',
+        hint: '초콜릿 아트는 섬세함과 창의력이 핵심이에요! 🎨'
+      },
+      {
+        q: '카카오 열매 속의 무엇이 초콜릿의 주원료가 될까요?',
+        choices: ['카카오빈(씨앗)', '카카오 껍질', '카카오 잎', '카카오 나무 줄기'],
+        answer: '카카오빈(씨앗)',
+        hint: '카카오 열매 안의 씨앗인 "카카오빈"으로 초콜릿을 만들어요! 🫘'
+      }
+    ],
+
+    // ──────────────────────────────
+    // 중등 시작 퀴즈 (학교 3 + 과목 2)
+    // ──────────────────────────────
+    middle_robot_start: [
+      ...schoolQs(),
+      {
+        q: '로봇이 스스로 판단하고 행동하게 만드는 핵심 기술은 무엇일까요?',
+        choices: shuffleWithCorrect('인공지능(AI)', ['센서 기술', '배터리 기술', '도색 기술']),
+        answer: '인공지능(AI)',
+        hint: '로봇에 인공지능(AI)을 탑재해야 스스로 판단할 수 있어요! 🧠'
+      },
+      {
+        q: '🎯 오늘의 진로 직업! 공학·프로그래밍·AI를 결합해 지능형 로봇을 연구·개발하는 직업은?',
+        choices: shuffleWithCorrect('로봇공학자', ['드론전문가', '쇼콜라티에', '소프트웨어 개발자']),
+        answer: '로봇공학자',
+        hint: '오늘 여러분이 체험할 직업, "로봇공학자"입니다! 🤖'
+      }
+    ],
+    middle_drone_start: [
+      ...schoolQs(),
+      {
+        q: '드론의 공식 명칭 UAV의 풀네임으로 올바른 것은?',
+        choices: shuffleWithCorrect('Unmanned Aerial Vehicle', ['Universal Air Vehicle', 'Unified Auto Vehicle', 'Unmanned Auto Vessel']),
+        answer: 'Unmanned Aerial Vehicle',
+        hint: 'UAV = Unmanned Aerial Vehicle, 즉 무인항공기를 뜻해요! ✈️'
+      },
+      {
+        q: '🎯 오늘의 진로 직업! UAV 설계부터 자이로스코프 활용까지 드론 기술을 전문으로 다루는 직업은?',
+        choices: shuffleWithCorrect('드론전문가', ['로봇공학자', '쇼콜라티에', '항공기 조종사']),
+        answer: '드론전문가',
+        hint: '오늘 여러분이 체험할 직업, "드론전문가"입니다! 🚁'
+      }
+    ],
+    middle_choco_start: [
+      ...schoolQs(),
+      {
+        q: '초콜릿 제조 시 카카오 버터 결정을 안정화해 광택과 바삭함을 만드는 과정은?',
+        choices: shuffleWithCorrect('템퍼링(Tempering)', ['발효', '건조', '냉동']),
+        answer: '템퍼링(Tempering)',
+        hint: '카카오 버터 결정을 안정화하는 과정이 "템퍼링"이에요! 🌡️'
+      },
+      {
+        q: '🎯 오늘의 진로 직업! 카카오빈 선별부터 템퍼링까지 초콜릿 전 과정을 다루는 직업은?',
+        choices: shuffleWithCorrect('쇼콜라티에', ['로봇공학자', '드론전문가', '제과제빵사']),
+        answer: '쇼콜라티에',
+        hint: '오늘 여러분이 체험할 직업, "쇼콜라티에"입니다! 🍫'
+      }
+    ],
+
+    // ──────────────────────────────
+    // 중·고등 마무리 퀴즈
+    // ──────────────────────────────
+    middle_robot_end: [
+      {
+        q: '오늘 수업에서 로봇이 스스로 판단하는 데 사용된 기술은?',
+        choices: shuffleWithCorrect('인공지능(AI)', ['블루투스', '와이파이', '배터리 관리']),
+        answer: '인공지능(AI)',
+        hint: '로봇의 자율 판단에는 인공지능(AI)이 핵심입니다! 🧠'
+      },
+      {
+        q: '로봇이 같은 동작을 반복 수행할 수 있는 이유는?',
+        choices: shuffleWithCorrect('프로그래밍된 알고리즘', ['마법', '운', '감정']),
+        answer: '프로그래밍된 알고리즘',
+        hint: '알고리즘 덕분에 로봇은 정확하게 반복 작업을 해요! 🔁'
+      },
+      {
+        q: '산업 현장에서 로봇이 사람보다 유리한 이유는?',
+        choices: shuffleWithCorrect('24시간 피로 없이 정밀 작업 가능', ['감정이 풍부해서', '말을 잘 해서', '음식을 먹지 않아서']),
+        answer: '24시간 피로 없이 정밀 작업 가능',
+        hint: '로봇은 지치지 않고 정밀하게 반복 작업할 수 있어요! ⚙️'
+      },
+      {
+        q: '로봇공학자가 미래에 가장 주목하는 분야는?',
+        choices: shuffleWithCorrect('의료 로봇·우주 탐사 로봇', ['오락만', '청소만', '요리만']),
+        answer: '의료 로봇·우주 탐사 로봇',
+        hint: '의료·우주 분야에서 로봇의 역할이 점점 커지고 있어요! 🚀'
+      },
+      {
+        q: '🎯 오늘 수업을 통해 체험한 직업! 로봇을 설계·프로그래밍하는 이 직업은?',
+        choices: shuffleWithCorrect('로봇공학자', ['드론전문가', '쇼콜라티에', '소프트웨어 개발자']),
+        answer: '로봇공학자',
+        hint: '오늘 체험한 직업, "로봇공학자"입니다! 수고했어요 🤖'
+      }
+    ],
+    middle_drone_end: [
+      {
+        q: '드론 비행 전 반드시 확인해야 하는 법적 사항은?',
+        choices: shuffleWithCorrect('비행 금지·제한 구역 확인', ['드론 색깔', '조종기 브랜드', '날씨 예보 앱']),
+        answer: '비행 금지·제한 구역 확인',
+        hint: '비행 전 반드시 비행 금지 구역을 확인해야 해요! ⚖️'
+      },
+      {
+        q: '오늘 배운 드론의 안정적 자세 유지에 핵심적인 센서는?',
+        choices: shuffleWithCorrect('자이로스코프', ['카메라', '마이크', '온도 센서']),
+        answer: '자이로스코프',
+        hint: '자이로스코프가 드론 기울기를 감지해 균형을 잡아요! ⚖️'
+      },
+      {
+        q: '드론 배터리가 방전 임박 시 올바른 조치는?',
+        choices: shuffleWithCorrect('즉시 귀환·착륙 명령', ['더 빠르게 비행', '고도를 높인다', '무시한다']),
+        answer: '즉시 귀환·착륙 명령',
+        hint: '배터리 부족 시 즉시 귀환해야 추락 사고를 막을 수 있어요! 🛬'
+      },
+      {
+        q: '드론 기술이 가장 빠르게 성장하는 산업 분야는?',
+        choices: shuffleWithCorrect('물류·배달 및 농업', ['인쇄업', '제지업', '광업']),
+        answer: '물류·배달 및 농업',
+        hint: '드론 배달과 정밀 농업이 가장 빠르게 성장하고 있어요! 📦'
+      },
+      {
+        q: '🎯 오늘 수업을 통해 체험한 직업! 드론을 전문으로 운용·개발하는 이 직업은?',
+        choices: shuffleWithCorrect('드론전문가', ['로봇공학자', '쇼콜라티에', '항공기 조종사']),
+        answer: '드론전문가',
+        hint: '오늘 체험한 직업, "드론전문가"입니다! 수고했어요 🚁'
+      }
+    ],
+    middle_choco_end: [
+      {
+        q: '카카오 함량이 높아질수록 초콜릿의 맛은 어떻게 변할까요?',
+        choices: shuffleWithCorrect('쓴맛이 강해진다', ['단맛이 강해진다', '신맛이 강해진다', '맛이 없어진다']),
+        answer: '쓴맛이 강해진다',
+        hint: '카카오 함량이 높을수록 쓴맛이 강해지고 건강에 좋은 성분도 많아요! 🍫'
+      },
+      {
+        q: '오늘 배운 템퍼링의 주요 목적은 무엇인가요?',
+        choices: shuffleWithCorrect('카카오 버터의 결정 구조 안정화', ['색깔 변경', '단맛 추가', '부피 키우기']),
+        answer: '카카오 버터의 결정 구조 안정화',
+        hint: '템퍼링으로 초콜릿이 광택 있고 바삭하게 굳어요! 🌡️'
+      },
+      {
+        q: '화이트 초콜릿이 다크 초콜릿과 다른 점은?',
+        choices: shuffleWithCorrect('카카오 고형분(파우더)이 없다', ['설탕이 없다', '지방이 없다', '더 쓰다']),
+        answer: '카카오 고형분(파우더)이 없다',
+        hint: '화이트 초콜릿은 카카오 버터만 사용해 카카오 고형분이 없어요! 🤍'
+      },
+      {
+        q: '쇼콜라티에가 수제 초콜릿을 보관할 때 가장 적합한 온도는?',
+        choices: shuffleWithCorrect('16~18°C', ['0°C 이하', '30°C 이상', '25°C']),
+        answer: '16~18°C',
+        hint: '수제 초콜릿은 16~18°C의 서늘하고 건조한 곳에 보관해야 해요! ❄️'
+      },
+      {
+        q: '🎯 오늘 수업을 통해 체험한 직업! 카카오로 초콜릿 예술을 완성하는 이 직업은?',
+        choices: shuffleWithCorrect('쇼콜라티에', ['로봇공학자', '드론전문가', '제과제빵사']),
+        answer: '쇼콜라티에',
+        hint: '오늘 체험한 직업, "쇼콜라티에"입니다! 수고했어요 🍫'
+      }
+    ]
+  };
+
+  const key = `${grade}_${subject}_${timing}`;
+  return data[key] || [];
+}
+
+// ───────────────────────────────────────────────
+// 보기 셔플 (정답 포함)
+// ───────────────────────────────────────────────
+function shuffleWithCorrect(correct, others) {
+  const pool = others.filter(o => o !== correct).slice(0, 3);
+  pool.push(correct);
+  return pool.sort(() => Math.random() - 0.5);
+}
+
+// ───────────────────────────────────────────────
+// 상태
+// ───────────────────────────────────────────────
+let state = { grade: '', subject: '', timing: '', questions: [], current: 0, score: 0, answers: [] };
+
+const subjectInfo = {
+  robot: { label: '🤖 로봇공학자', color: '#3B82F6', bg: '#EFF6FF' },
+  drone: { label: '🚁 드론전문가', color: '#10B981', bg: '#ECFDF5' },
+  choco: { label: '🍫 쇼콜라티에', color: '#92400E', bg: '#FEF3C7' }
+};
+const timingLabel = { start: '🔔 시작 퀴즈', end: '🏆 마무리 퀴즈' };
+const gradeLabel  = { elem: '초등', middle: '중·고등' };
+
+// ───────────────────────────────────────────────
+// 네비게이션
+// ───────────────────────────────────────────────
+function show(id) {
+  ['stepGrade','stepSubject','stepTiming','stepQuiz','stepResult'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function selectGrade(g) {
+  state.grade = g;
+  // 초등은 시작/마무리 모두, 중등은 시작만 → timing 자동 설정 없음, 단 표시 달리
+  show('stepSubject');
+}
+
+function selectSubject(s) {
+  state.subject = s;
+  show('stepTiming');
+  const endBtn = document.querySelector('.sel-btn.end-btn');
+  endBtn.style.opacity = '1';
+  endBtn.style.pointerEvents = '';
+  endBtn.querySelector('.desc').textContent = '오늘 배운 내용 확인';
+}
+
+function selectTiming(t) {
+  state.timing = t;
+  startQuiz();
+}
+
+function startQuiz() {
+  const qs = getQuizData(state.grade, state.subject, state.timing);
+  if (!qs.length) { alert('준비 중인 퀴즈입니다!'); return; }
+  state.questions = qs;
+  state.current = 0;
+  state.score = 0;
+  state.answers = [];
+  show('stepQuiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = state.questions[state.current];
+  const total = state.questions.length;
+  const pct = (state.current / total) * 100;
+
+  const si = subjectInfo[state.subject];
+  document.getElementById('quizMeta').textContent = `${gradeLabel[state.grade]} · ${timingLabel[state.timing]}`;
+  document.getElementById('quizBadge').textContent = si.label;
+  document.getElementById('quizBadge').style.background = si.color;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('questionNum').textContent = `문제 ${state.current + 1} / ${total}`;
+  document.getElementById('questionText').textContent = q.q;
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  document.getElementById('nextBtn').classList.remove('show');
+
+  const container = document.getElementById('choicesContainer');
+  container.innerHTML = '';
+  const markers = ['①', '②', '③', '④'];
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-marker">${markers[i]}</span><span>${c}</span>`;
+    btn.onclick = () => selectAnswer(c, btn, q);
+    container.appendChild(btn);
+  });
+}
+
+function selectAnswer(selected, btn, q) {
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const isCorrect = selected === q.answer;
+  if (isCorrect) {
+    btn.classList.add('correct');
+    state.score++;
+  } else {
+    btn.classList.add('wrong');
+    // 정답 강조
+    allBtns.forEach(b => {
+      if (b.querySelector('span:last-child').textContent === q.answer) b.classList.add('correct');
+    });
+  }
+
+  state.answers.push({ q: q.q, selected, correct: q.answer, isCorrect, hint: q.hint });
+
+  const fb = document.getElementById('feedback');
+  if (isCorrect) {
+    fb.className = 'feedback correct show';
+    fb.textContent = '🎉 정답입니다! ' + q.hint;
+  } else {
+    fb.className = 'feedback wrong show';
+    fb.textContent = '😅 틀렸습니다. ' + q.hint;
+  }
+
+  document.getElementById('nextBtn').textContent =
+    state.current + 1 < state.questions.length ? '다음 문제 →' : '결과 보기 🏆';
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function nextQuestion() {
+  state.current++;
+  if (state.current < state.questions.length) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  show('stepResult');
+  const total = state.questions.length;
+  const s = state.score;
+  document.getElementById('resultScore').textContent = s;
+  document.getElementById('resultTotal').textContent = total;
+
+  const pct = Math.round((s / total) * 100);
+  let title, desc;
+  if (pct === 100)      { title = '🏆 완벽해요!';       desc = '모든 문제를 맞혔어요! 정말 대단해요!'; }
+  else if (pct >= 80)   { title = '👏 훌륭해요!';       desc = '거의 다 맞혔어요! 조금만 더 집중해요.'; }
+  else if (pct >= 60)   { title = '😊 잘 했어요!';      desc = '절반 이상 맞혔어요! 오늘 수업을 들으면 더 잘 알게 될 거예요.'; }
+  else                   { title = '💪 도전 중이에요!'; desc = '괜찮아요! 오늘 수업을 통해 더 많이 배워 봐요!'; }
+
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultDesc').textContent = desc;
+
+  const ul = document.getElementById('resultList');
+  ul.innerHTML = '';
+  state.answers.forEach((a, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="ri">${a.isCorrect ? '✅' : '❌'}</span><div><strong>Q${i+1}.</strong> ${a.q}<br><small style="color:${a.isCorrect ? '#16a34a' : '#dc2626'}">내 답: ${a.selected} / 정답: ${a.correct}</small></div>`;
+    ul.appendChild(li);
+  });
+}
+
+function restart() {
+  state = { grade: '', subject: '', timing: '', questions: [], current: 0, score: 0, answers: [] };
+  show('stepGrade');
+}
+
+// ───────────────────────────────────────────────
+// 페이지 로드 시 학교 정보 상태 표시
+// ───────────────────────────────────────────────
+function updateToggleLabel() {
+  const btn = document.getElementById('setupToggleBtn');
+  const allSet = school.tree && school.flower && school.principal;
+  const anySet = school.tree || school.flower || school.principal;
+  if (allSet) {
+    btn.innerHTML = `✅ 학교 정보 저장됨 · <span style="opacity:0.75;font-weight:400">${school.tree} / ${school.flower} / ${school.principal}</span>`;
+  } else if (anySet) {
+    btn.innerHTML = `⚠️ 학교 정보 일부 미입력 · <span style="opacity:0.75;font-weight:400">클릭해서 확인</span>`;
+  } else {
+    btn.textContent = '🔐 관리자 모드 · 학교 정보 설정';
+  }
+}
+
+// 초기 화면
+show('stepGrade');
+updateToggleLabel();
+</script>
+</body>
+</html>
