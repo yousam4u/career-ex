@@ -64,11 +64,12 @@
     cursor: pointer;
     font-size: 0.85rem;
     margin-bottom: 12px;
-    display: inline-flex;
+    display: none; /* 기본 숨김 — 제목 5회 클릭 시 노출 */
     align-items: center;
     gap: 6px;
     transition: background 0.2s;
   }
+  .setup-toggle.visible { display: inline-flex; }
   .setup-toggle:hover { background: rgba(255,255,255,0.25); }
 
   .setup-panel {
@@ -349,7 +350,7 @@
 <div class="container">
   <!-- 헤더 -->
   <div class="header">
-    <h1>🎯 진로체험 퀴즈</h1>
+    <h1 id="mainTitle" onclick="adminTap()" style="cursor:default;user-select:none">🎯 진로체험 퀴즈</h1>
     <p>수업 시작과 마무리를 퀴즈로 함께해요!</p>
   </div>
 
@@ -1059,6 +1060,26 @@ function showResult() {
 function restart() {
   state = { grade: '', subject: '', timing: '', questions: [], current: 0, score: 0, answers: [] };
   show('stepGrade');
+}
+
+// ───────────────────────────────────────────────
+// 관리자 모드 — 제목 5회 연속 클릭으로 진입
+// ───────────────────────────────────────────────
+let adminTapCount = 0, adminTapTimer = null;
+function adminTap() {
+  adminTapCount++;
+  clearTimeout(adminTapTimer);
+  if (adminTapCount >= 5) {
+    adminTapCount = 0;
+    const btn = document.getElementById('setupToggleBtn');
+    btn.classList.add('visible');
+    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 살짝 흔들어 알림
+    btn.style.animation = 'none';
+    setTimeout(() => btn.style.animation = '', 10);
+  } else {
+    adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 1500);
+  }
 }
 
 // ───────────────────────────────────────────────
